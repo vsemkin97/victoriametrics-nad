@@ -33,9 +33,16 @@ jobs:
           go vet ./app/vminsert/... ./lib/httpserver/...
           go test -race ./app/vminsert/... ./lib/httpserver/...
 
+      - name: Prepare builder image
+        # The upstream builder image also downloads musl cross toolchains from musl.cc, which is unreachable
+        # from GitHub runners. The native amd64 build needs only Alpine's gcc + musl-dev.
+        run: |
+          printf 'FROM golang:1.23.5-alpine\nSTOPSIGNAL SIGINT\nRUN apk add --no-cache git gcc musl-dev make\n' \
+            | docker build -t local/nad-builder:go1.23.5 -
+
       - name: Build victoria-metrics-prod
-        # Same static musl build in Docker as upstream release binaries.
-        run: make victoria-metrics-prod
+        # Same static musl build in Docker (flags, tags, version info) as upstream release binaries.
+        run: make victoria-metrics-prod BUILDER_IMAGE=local/nad-builder:go1.23.5
 
       - name: Package
         run: |
