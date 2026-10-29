@@ -26,6 +26,7 @@ import (
 	"github.com/VictoriaMetrics/VictoriaMetrics/app/vminsert/prompush"
 	"github.com/VictoriaMetrics/VictoriaMetrics/app/vminsert/promremotewrite"
 	"github.com/VictoriaMetrics/VictoriaMetrics/app/vminsert/relabel"
+	"github.com/VictoriaMetrics/VictoriaMetrics/app/vminsert/stream"
 	"github.com/VictoriaMetrics/VictoriaMetrics/app/vminsert/vmimport"
 	"github.com/VictoriaMetrics/VictoriaMetrics/lib/auth"
 	"github.com/VictoriaMetrics/VictoriaMetrics/lib/bytesutil"
@@ -132,6 +133,11 @@ func RequestHandler(w http.ResponseWriter, r *http.Request) bool {
 	defer requestDuration.UpdateDuration(startTime)
 
 	path := strings.Replace(r.URL.Path, "//", "/", -1)
+	if path == "/api/v1/stream" {
+		// NAD modification: websocket stream of freshly ingested samples.
+		stream.Handler(w, r)
+		return true
+	}
 	if strings.HasPrefix(path, "/static") {
 		staticServer.ServeHTTP(w, r)
 		return true

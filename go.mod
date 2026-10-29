@@ -31,6 +31,7 @@ require (
 	github.com/golang/snappy v0.0.4
 	github.com/google/go-cmp v0.6.0
 	github.com/googleapis/gax-go/v2 v2.14.1
+	github.com/gorilla/websocket v1.5.3
 	github.com/influxdata/influxdb v1.11.8
 	github.com/klauspost/compress v1.17.11
 	github.com/mattn/go-isatty v0.0.20

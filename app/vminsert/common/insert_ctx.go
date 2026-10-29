@@ -7,6 +7,7 @@ import (
 	"github.com/VictoriaMetrics/metrics"
 
 	"github.com/VictoriaMetrics/VictoriaMetrics/app/vminsert/relabel"
+	"github.com/VictoriaMetrics/VictoriaMetrics/app/vminsert/stream"
 	"github.com/VictoriaMetrics/VictoriaMetrics/app/vmstorage"
 	"github.com/VictoriaMetrics/VictoriaMetrics/lib/bytesutil"
 	"github.com/VictoriaMetrics/VictoriaMetrics/lib/httpserver"
@@ -211,6 +212,10 @@ func (ctx *InsertCtx) FlushBufs() error {
 	// used at every stream.Parse() call under lib/protoparser/*
 
 	err := vmstorage.AddRows(ctx.mrs)
+	if err == nil {
+		// NAD modification: broadcast stored samples to /api/v1/stream subscribers.
+		stream.Publish(ctx.mrs)
+	}
 	ctx.Reset(0)
 	if err == nil {
 		return nil

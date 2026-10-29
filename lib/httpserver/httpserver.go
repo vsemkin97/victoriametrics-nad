@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"bufio"
 	"context"
 	"crypto/tls"
 	_ "embed"
@@ -555,6 +556,17 @@ func (rwa *responseWriterWithAbort) Write(data []byte) (int, error) {
 		rwa.sentHeaders = true
 	}
 	return rwa.ResponseWriter.Write(data)
+}
+
+// Hijack implements http.Hijacker.
+//
+// NAD modification: required for the websocket upgrade at /api/v1/stream.
+func (rwa *responseWriterWithAbort) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	hj, ok := rwa.ResponseWriter.(http.Hijacker)
+	if !ok {
+		return nil, nil, fmt.Errorf("BUG: ResponseWriter must implement http.Hijacker interface")
+	}
+	return hj.Hijack()
 }
 
 func (rwa *responseWriterWithAbort) WriteHeader(statusCode int) {
