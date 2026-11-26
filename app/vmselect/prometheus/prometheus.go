@@ -327,6 +327,13 @@ func exportHandler(qt *querytracer.Tracer, w http.ResponseWriter, cp *commonPara
 			WriteExportPrometheusLine(bb, xb)
 			return sw.maybeFlushBuffer(bb)
 		}
+	} else if format == "columnar" {
+		contentType = "application/octet-stream"
+		writeLineFunc = func(xb *exportBlock, workerID uint) error {
+			bb := sw.getBuffer(workerID)
+			bb.B = writeExportColumnarLine(bb.B, xb)
+			return sw.maybeFlushBuffer(bb)
+		}
 	} else if format == "promapi" {
 		WriteExportPromAPIHeader(bw)
 		var firstLineOnce atomic.Bool
