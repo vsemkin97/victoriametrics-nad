@@ -1,3 +1,5 @@
+// NAD modification: this file is not part of upstream VictoriaMetrics.
+
 package prometheus
 
 import (

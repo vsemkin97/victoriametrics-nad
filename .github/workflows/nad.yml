@@ -4,10 +4,10 @@ name: nad-build
 # Every push to the nad branch builds and tests; a tag like v1.110.0-nad.1 also publishes a GitHub release.
 on:
   push:
-    branches: [nad]
+    branches: [nad, nad2]
     tags: ['v*-nad.*']
   pull_request:
-    branches: [nad]
+    branches: [nad, nad2]
   workflow_dispatch:
 
 permissions:
@@ -30,8 +30,8 @@ jobs:
         env:
           GOFLAGS: -mod=vendor
         run: |
-          go vet ./app/vminsert/... ./lib/httpserver/...
-          go test -race ./app/vminsert/... ./lib/httpserver/...
+          go vet ./app/vminsert/... ./app/vmselect/prometheus/... ./lib/httpserver/...
+          go test -race ./app/vminsert/... ./app/vmselect/prometheus/... ./lib/httpserver/...
 
       - name: Prepare builder image
         # The upstream builder image also downloads musl cross toolchains from musl.cc, which is unreachable

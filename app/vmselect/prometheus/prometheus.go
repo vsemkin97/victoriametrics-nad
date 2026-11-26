@@ -328,6 +328,7 @@ func exportHandler(qt *querytracer.Tracer, w http.ResponseWriter, cp *commonPara
 			return sw.maybeFlushBuffer(bb)
 		}
 	} else if format == "columnar" {
+		// NAD modification: binary export for the NAD application, see export_columnar.go.
 		contentType = "application/octet-stream"
 		writeLineFunc = func(xb *exportBlock, workerID uint) error {
 			bb := sw.getBuffer(workerID)
