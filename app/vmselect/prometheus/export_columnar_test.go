@@ -1,6 +1,7 @@
 package prometheus
 
 import (
+	"bytes"
 	"math"
 	"reflect"
 	"testing"
@@ -26,8 +27,9 @@ func TestWriteExportColumnarLine(t *testing.T) {
 		t.Fatalf("labels %v", labels)
 	}
 	n := u32()
-	if n != 2 || encoding.UnmarshalInt64(b) != 1000 || encoding.UnmarshalInt64(b[8:]) != 61000 {
-		t.Fatalf("timestamps n=%d", n)
+	// the exact bytes of a plain big-endian int64, as a reader outside Go decodes them (not zig-zag)
+	if n != 2 || !bytes.Equal(b[:16], []byte{0, 0, 0, 0, 0, 0, 0x03, 0xe8, 0, 0, 0, 0, 0, 0, 0xee, 0x48}) {
+		t.Fatalf("timestamps n=%d %x", n, b[:16])
 	}
 	b = b[16:]
 	if math.Float64frombits(encoding.UnmarshalUint64(b)) != 1.5 || !math.IsNaN(math.Float64frombits(encoding.UnmarshalUint64(b[8:]))) || len(b) != 16 {

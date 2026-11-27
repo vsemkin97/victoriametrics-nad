@@ -54,7 +54,7 @@ Same series, filters and time range as the JSON `/api/v1/export`, written withou
 (`Content-Type: application/octet-stream`). One record per series, all integers big-endian:
 
 - `u32` label count, then per label `u32` length + name, `u32` length + value (`__name__` first, if any)
-- `u32 n`, then `n` x `i64` timestamps in ms, then `n` x `f64` values as IEEE 754 bits (NaN where JSON has `null`)
+- `u32 n`, then `n` x `i64` timestamps in ms (plain two's complement, not zig-zag), then `n` x `f64` values as IEEE 754 bits (NaN where JSON has `null`)
 
 100k series x 4032 points: 0.8 s on 8 readers instead of 6.4 s with JSON (NAD issue #75).
 
